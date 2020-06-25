@@ -87,4 +87,4 @@ clean_glue: require_service
 	aws s3 rm --recursive $(S3_CONVERTED_TARGET)
 
 test:
-	python -m pytest test
+	python -m pytest -vv test

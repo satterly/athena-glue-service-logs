@@ -60,7 +60,7 @@ class S3Reader:
         return region_list
 
     def get_first_date_in_prefix(self, prefix=None):
-        """A simple method to return the first date in a given prefix that is partiioned like Y/m/d
+        """A simple method to return the first date in a given prefix that is partitioned like YYYY/mm/dd
         If a prefix is provided, it will be appended to the original path provided to this class.
 
         Returns a tuple of the date in [year, month, date] format.
@@ -88,6 +88,35 @@ class S3Reader:
         date_tuple = [part.split('=')[1] for part in first_key.split('/')[-4:-1]]
 
         return date_tuple
+
+    def get_first_datetime_in_prefix(self, prefix=None):
+        """A simple method to return the first datetime in a given prefix that is partitioned like YYYY/mm/dd/hh
+        If a prefix is provided, it will be appended to the original path provided to this class.
+
+        Returns a tuple of the date in [year, month, date, hour] format.
+        """
+        first_key = self._get_first_key_in_prefix(prefix)
+
+        # Verify we have a matching format
+        if re.search(r'/\d{4}/\d{2}/\d{2}/\d{2}/', first_key) is None:
+            raise Exception("No datetime partitions found in prefix: s3://%s/%s" % (self.s3_bucket, prefix))
+
+        datetime_tuple = first_key.split('/')[-5:-1]
+        return datetime_tuple
+
+    def get_first_hivecompatible_datetime_in_prefix(self, partition_keys, prefix=None):
+        """A method to return the first datetime in a given prefix, when using hive-compatible partitions"""
+        first_key = self._get_first_key_in_prefix(prefix)
+
+        # Verify we have a matching format
+        regexp = "/" + '/'.join([r"%s=\d+" % key for key in partition_keys]) + "/"
+        if re.search(regexp, first_key) is None:
+            raise Exception("No Hive-compatible datetime partitions found in prefix: s3://%s/%s" % (self.s3_bucket, prefix))
+
+        # Do we want to return ['Y', 'M', 'D', 'H'] or ['year=Y', 'month=M', 'day=D', 'hour=H']?
+        datetime_tuple = [part.split('=')[1] for part in first_key.split('/')[-5:-1]]
+
+        return datetime_tuple
 
 
     def does_have_objects(self):

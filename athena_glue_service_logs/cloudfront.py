@@ -19,7 +19,7 @@ https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/AccessLogs.ht
 import logging
 
 from athena_glue_service_logs.catalog_manager import BaseCatalogManager
-from athena_glue_service_logs.partitioners.date_partitioner import DatePartitioner
+from athena_glue_service_logs.partitioners.datetime_partitioner import DateTimePartitioner
 from athena_glue_service_logs.partitioners.null_partitioner import NullPartitioner
 
 
@@ -96,7 +96,7 @@ class CloudFrontConvertedCatalog(BaseCatalogManager):
         return "time"
 
     def get_partitioner(self):
-        return DatePartitioner(s3_location=self.s3_location, hive_compatible=True)
+        return DateTimePartitioner(s3_location=self.s3_location, hive_compatible=True)
 
     def _build_storage_descriptor(self, partition_values=None):
         if partition_values is None:
