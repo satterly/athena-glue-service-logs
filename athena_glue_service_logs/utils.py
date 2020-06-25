@@ -80,7 +80,7 @@ class S3Reader:
         first_key = self._get_first_key_in_prefix(prefix)
 
         # Verify we have a matching format
-        regexp = "/" + '/'.join(["%s=\d+" % key for key in partition_keys]) + "/"
+        regexp = "/" + '/'.join([r"%s=\d+" % key for key in partition_keys]) + "/"
         if re.search(regexp, first_key) is None:
             raise Exception("No Hive-compatible date partitions found in prefix: s3://%s/%s" % (self.s3_bucket, prefix))
 
