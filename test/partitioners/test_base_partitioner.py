@@ -28,6 +28,18 @@ def test_date_generator(mocker):
     assert new_tuples[-1] == today.__str__().split('-')
 
 
+def test_datetime_generator(mocker):
+    mocker.patch.multiple(BasePartitioner, __abstractmethods__=set())
+    base_part = BasePartitioner(s3_location="s3://nowhere")
+    now = datetime.utcfromtimestamp(time.time())
+
+    datetime_tuple = ['2020', '06', '24', '12']
+    new_tuples = base_part._get_datetime_values_since_initial_time(datetime_tuple)
+
+    assert new_tuples[0] == ['2020', '06', '24', '13']
+    assert new_tuples[-1] == now.strftime('%Y-%m-%d-%H').split('-')
+
+
 def test_nonhive_partitioned_path(mocker):
     mocker.patch.multiple(BasePartitioner, __abstractmethods__=set())
     base_part = BasePartitioner(s3_location="s3://nowhere")

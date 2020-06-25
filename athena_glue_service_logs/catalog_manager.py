@@ -63,7 +63,7 @@ class BaseCatalogManager(metaclass=abc.ABCMeta):
         self.get_and_create_partitions()
 
     def create_table(self):
-        """Create this database talbe in the Data Catalog"""
+        """Create this database table in the Data Catalog"""
         LOGGER.info("Creating database table %s", self.table_name)
         self.glue_client.create_table(
             DatabaseName=self.database_name,

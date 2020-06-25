@@ -61,6 +61,24 @@ class BasePartitioner(metaclass=abc.ABCMeta):
 
         return partitions
 
+    def _get_datetime_values_since_initial_time(self, datetime_tuple):
+        """Takes an initial datetime tuple and returns a computed set of datetime tuples until UTC now
+
+        Does _not_ include the original datetime tuple.
+        """
+        partitions = []
+        datetime_ints = list(map(int, datetime_tuple))
+        initial_time = datetime(*datetime_ints)
+        now = datetime.utcfromtimestamp(time.time())
+
+        diff = now-initial_time
+        for i in range((diff.days * 86400 + diff.seconds) // 3600):
+            new_time = initial_time + timedelta(hours=i+1)
+            part = new_time.strftime('%Y-%m-%d-%H').split('-')
+            partitions.append(part)
+
+        return partitions
+
     def build_partitioned_path(self, partition_values):
         """Takes a tuple of partition values and returns the S3 URI for that specific partition."""
         base_path = self.s3_location.rstrip('/')
